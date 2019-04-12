@@ -4,8 +4,134 @@
     <meta name="viewport" content="width=device-width">
     <script type="text/javascript" src="cordova.js"></script>
     <script type="text/javascript">
+
+    var map;
+
+    var coordinates = {
+      barcelona:{
+        "lat":41.390205,
+        "lng": 2.154007
+      }
+    }
+
+    var items = [{
+      src : "https://newbritanniaschool.com/wp-content/uploads/2016/06/new-britannia-escola-angles-barcelona.png",
+      title: "New Britania School of English",
+      description: "This is the first school",
+      city: "Horta-Guinardó",
+      languages:["English"],
+      position:{lat: 41.4297455, lng: 2.1621125}
+    },{
+      src : "//geo1.ggpht.com/cbk?panoid=raVARMb-ECQ4Aq0-UM-9PA&amp;output=thumbnail&amp;cb_client=search.TACTILE.gps&amp;thumb=2&amp;w=408&amp;h=200&amp;yaw=269.65433&amp;pitch=0&amp;thumbfov=100",
+      title: "BELFORT LANGUAGE CENTRE HORTA",
+      description: "This is the first school",
+      city: "Horta-Guinardó",
+      languages:["Catalan","Spanish"],
+      position:{lat:41.4274435, lng:2.1576553}
+    },{
+      src : "//geo0.ggpht.com/cbk?panoid=662LQVY22SK56MD6Q9ya2A&amp;output=thumbnail&amp;cb_client=search.TACTILE.gps&amp;thumb=2&amp;w=408&amp;h=200&amp;yaw=183.65013&amp;pitch=0&amp;thumbfov=100",
+      title: "CAMDEN ENGLISH",
+      description: "This is the first school",
+      city: "Horta-Guinardó",
+      languages:["English"],
+      position:{lat:41.4224619, lng:2.1525499}
+    },{
+      src : "https://lh5.googleusercontent.com/p/AF1QipO_tNWiFBrkI7xXrdV67SlPomqhbJA9irej1xvj=w408-h544-k-no",
+      title: "Docklands Academia",
+      description: "This is the first school",
+      city: "Horta-Guinardó",
+      languages:["Catalan"],
+      position:{lat:41.4239327, lng:2.1574425}
+    },{
+      src : "https://www.meritschool.com/wp-content/uploads/2015/04/logo-meritschool-escuela-de-idiomas.png",
+      title: "Merit School Maragall",
+      description: "This is the second school",
+      city: "Horta-Guinardó",
+      languages:["English","Spanish","French","Italian","Japanese","German","Chinese","Russian","Portuguese"],
+      position:{lat: 41.4219968, lng: 2.1780102}
+    },{
+      src : "https://www.startupestudis.com/s/misc/logo.png?t=1546861765",
+      title: "Start Up Centre d'Estudis",
+      description: "This is the second school",
+      city: "Horta-Guinardó",
+      languages:["English","Spanish","French","Italian","Arabic","German","Chinese","Russian","Tutoring","Portuguese","Catalan"],
+      position:{lat: 41.4294618, lng: 2.1658497}
+    },{
+      src : "https://www.startupestudis.com/s/misc/logo.png?t=1546861765",
+      title: "Arenys de Munt. Biblioteca Antònia Torrent i Martori",
+      description: " lkj",
+      city: "Barcelona",
+      languages:["English speaking","French speaking"],
+      position:{lat: 41.610368, lng: 2.5408969}
+    }
+    ];
+
+    function initMap() {
+      map = plugin.google.maps.Map.getMap(document.getElementById('map'));
+
+      map.setCameraTarget(coordinates.barcelona);
+      map.setCameraZoom(12);
+
+      var markers = [];
+      for(var i = 0; i< items.length;i++){
+        console.log(i,items[i]);
+        if(items[i].position){
+          //ToDo - try to explain the difference...
+          map.addMarker({
+            position: items[i].position,
+            title: items[i].title,
+            icon: 'blue',
+            'snippet': items[i].languages.join(", ")
+          });
+        }
+      }
+    }
+
+    function addItemToResults(item) {
+      var results = document.getElementById("results");
+
+      var div = document.createElement("div");
+      var img = document.createElement("img");
+      var h2 = document.createElement("h2");
+      var p = document.createElement("p");
+      h2.innerText = item.title;
+
+      var pText = document.createTextNode(item.description);
+      p.appendChild(pText);
+
+      var p2 = document.createElement("p");
+      var p2Text = document.createTextNode(item.city);
+      p2.appendChild(p2Text);
+
+      var plang= document.createElement("p");
+      var plangText = document.createTextNode(item.languages.join(", "));
+      plang.appendChild(plangText);
+
+      img.src = item.src;
+      div.className = "item";
+      div.appendChild(img);
+      div.appendChild(h2);
+      div.appendChild(p);
+      div.appendChild(p2);
+      div.appendChild(plang);
+
+      results.appendChild(div);
+    }
+
+    function showresults() {
+       var results = document.getElementById("results");
+      results.innerHTML="";
+      var sitio = document.getElementById("sitio").value;
+      var language = document.getElementById("language").value;
+      for(var i = 0; i<items.length; i++) {
+        if(items[i].city==sitio && items[i].languages.includes(language)) {
+          addItemToResults(items[i]);
+        }
+      }
+    }
+
     document.addEventListener("deviceready", function() {
-      var div = document.getElementById("map_canvas");
+      var div = document.getElementById("map");
 
       // If your app runs this program on browser,
       // you need to set `API_KEY_FOR_BROWSER_RELEASE` and `API_KEY_FOR_BROWSER_DEBUG`
@@ -17,61 +143,147 @@
       // If your app does not use browser,
       // you can comment out this code.
       plugin.google.maps.environment.setEnv({
-        'API_KEY_FOR_BROWSER_RELEASE': '(YOUR_API_KEY_IS_HERE)',
+        'API_KEY_FOR_BROWSER_RELEASE': '(API_KEY)',
         'API_KEY_FOR_BROWSER_DEBUG': ''
       });
 
       // Create a Google Maps native view under the map_canvas div.
-      var map = plugin.google.maps.Map.getMap(div);
-
-      // If you click the button, do something...
-      var button = document.getElementById("button");
-      button.addEventListener("click", function() {
-
-        // Move to the position with animation
-        map.animateCamera({
-          target: {lat: 37.422359, lng: -122.084344},
-          zoom: 17,
-          tilt: 60,
-          bearing: 140,
-          duration: 5000
-        });
-
-        // Add a maker
-        var marker = map.addMarker({
-          position: {lat: 37.422359, lng: -122.084344},
-          title: "Welecome to \n" +
-                 "Cordova GoogleMaps plugin for iOS,Android and Browser!",
-          snippet: "This plugin is awesome!",
-          animation: plugin.google.maps.Animation.BOUNCE
-        });
-
-        // Show the info window
-        marker.showInfoWindow();
-
-      });
+      initMap();
 
     }, false);
 
     </script>
     <style type="text/css">
-    html, body {
-      height: 100%;
-    }
-    #map_canvas { /* Must bigger size than 100x100 pixels */
-      width: 100%;
-      height: 80%;
-    }
     button {
       padding: .5em;
       margin: .5em;
     }
+    body{
+      font-family:Verdana, Geneva, sans-serif;
+      background-color: #4A79A4;
+      color: white;
+      height: 100%;
+    }
+    #content{
+      color: black
+    }
+    h1{
+      text-align:center;
+        font-size:50px
+    }
+    img{
+      display: block;
+      margin: 0 auto;
+      width: 200px
+    }
+    button{
+      margin:10px auto;
+      width:200px;
+      height:40px;
+      font-size:18px;
+      display: block;
+      background-color: #F4F2F4;
+      font-family: Verdana, Geneva, sans-serif;
+      border: 2px solid #8D9D9B;
+      border-radius: 8px;
+      color: #222939;
+    }
+
+    .form {
+      display:block;
+      margin:0 auto;
+      width:200px;
+    }
+
+    .form input{
+      display:block;
+      width:200px;
+    }
+
+    .form select{
+      display:block;
+      margin:0 auto;
+      width:150px;
+      height: 40px;
+      font-size:16px;
+      font-family: Verdana, Geneva, sans-serif;
+      margin-top:5px;
+      background-color: #8D9D9B;
+      border-radius: 8px;
+      border: 2px solid #8D9D9B;
+      color: #F4F2F4
+    }
+
+    #results {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: row;
+      justify-content: space-around;
+    }
+
+    #results .item {
+      margin: 5%;
+      max-width: 600px;
+    }
+
+    .item img, .item h2, .item p {
+      max-width: 600px;
+    }
+
+
+    /* Always set the map height explicitly to define the size of the div element that contains the map. */
+    #map {
+      height: 500px;
+      width: 500px;
+      margin: 0 auto;
+      color: black;
+    }
+    /* Optional: Makes the sample page fill the window. */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    p3{
+      margin-top:20px
+    }
     </style>
   </head>
   <body>
-    <h1>Hello, World!</h1>
-    <div id="map_canvas">
-      <button id="button">Click me!</button>
+    <h1>Find Your School</h1>
+    <div><img src="http://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Starry_Night_Over_the_Rhone.jpg/348px-Starry_Night_Over_the_Rhone.jpg"/></div>
+
+    <div class="form">
+      <select id="sitio">
+        <option>Ciutat Vella</option>
+        <option>Eixample</option>
+        <option>Sants-Montjuïc</option>
+        <option>Les Corts</option>
+        <option>Sarrià-Sant Gervasi</option>
+        <option>Gràcia</option>
+        <option>Horta-Guinardó</option>
+        <option>Nou Barris</option>
+        <option>Sant Andreu</option>
+        <option>Sant Martí</option>
+      </select>
+
+      <select id="language">
+        <option>English</option>
+        <option>Spanish</option>
+        <option>Catalan</option>
+        <option>French</option>
+        <option>Japanese</option>
+        <option>Chinese</option>
+        <option>Italian</option>
+        <option>Portuguese</option>
+        <option>Russian</option>
+      </select>
+      <button onclick="showresults()"> search </button>
     </div>
+
+    <div id="results">
+      <p3>This is our app. In order to find the results you are looking for, select the city and the language.</p3>
+    </div>
+    <div id="map"></div>
   </body>
 </html>
